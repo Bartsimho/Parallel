@@ -76,12 +76,11 @@ int main(int argc, char **argv) {
 		cl::Buffer dev_image_grey(context, CL_MEM_READ_WRITE, image_input.size()/3); //should be the same as input image
 
 		queue.enqueueWriteBuffer(dev_image_input, CL_TRUE, 0, image_input.size(), &image_input.data()[0]);
-//		queue.enqueueWriteBuffer(dev_convolution_mask, CL_TRUE, 0, convolution_mask.size()*sizeof(float), &convolution_mask[0]);
 
-		cl::Kernel RGBKernel = cl::Kernel(program, "rgb2gray");
+		cl::Kernel RGBKernel = cl::Kernel(program, "rgb2grey");
 		RGBKernel.setArg(0, dev_image_input);
 		RGBKernel.setArg(1, dev_image_grey);
-//		kernel.setArg(2, dev_convolution_mask);
+		RGBKernel.setArg(2, 3);
 
 		int local_size = 256;
 		cl::Device device = context.getInfo<CL_CONTEXT_DEVICES>()[0]; // get device
@@ -91,7 +90,7 @@ int main(int argc, char **argv) {
 		vector<unsigned char> grey_buffer(image_input.size()/3);
 
 		queue.enqueueReadBuffer(dev_image_grey, CL_TRUE, 0, grey_buffer.size(), &grey_buffer.data()[0]);
-
+	
 		CImg<unsigned char> grey_image(grey_buffer.data(), image_input.width(), image_input.height(), image_input.depth(), 1);
 		CImgDisplay disp_output(grey_image,"output");
 		
